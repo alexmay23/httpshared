@@ -4,7 +4,8 @@ import (
 	"net/http"
 	"strings"
 	"github.com/alexmay23/httputils"
-	"bitbucket.org/alexmay_23/pp_backend/shared"
+
+	"github.com/alexmay23/httpshared/shared"
 )
 
 

@@ -3,8 +3,8 @@ package user
 import (
 	"net/http"
 	"github.com/alexmay23/httputils"
-	"bitbucket.org/alexmay_23/pp_backend/shared"
 	"strconv"
+	"github.com/alexmay23/httpshared/shared"
 )
 
 type Transport struct {
