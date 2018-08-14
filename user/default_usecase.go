@@ -21,6 +21,8 @@ type DefaultUseCase struct {
 }
 
 
+
+
 func (self *DefaultUseCase) SendCode(phone string) {
 	code := rand.Intn(89999) + 10000
 	m := self.repository.GetByPhone(phone)
@@ -116,7 +118,7 @@ func (self *DefaultUseCase) getUserDataFromToken(token string)(map[string]interf
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
-		return []byte(self.config.GetSharedSecret()), nil
+		return []byte(self.config.GetValueForKey(shared.SecretKey)), nil
 	})
 	if err != nil {
 		return nil, err
@@ -129,11 +131,11 @@ func (self *DefaultUseCase) getUserDataFromToken(token string)(map[string]interf
 }
 
 func (self *DefaultUseCase) generateTokenHash(model *Model) string {
-	return self.config.GetSharedSecret() + model.Secret
+	return self.config.GetValueForKey(shared.SecretKey) + model.Secret
 }
 
 func (self *DefaultUseCase)sendVerificationSMS(phone string, code int){
-	self.deliverer.SendMessage(phone, fmt.Sprintf("Activatation Code %d", code))
+	self.deliverer.SendMessage(phone, fmt.Sprintf("Activation Code %d", code))
 }
 
 
@@ -148,12 +150,12 @@ func (self *DefaultUseCase)generateTokenFromModel(model *Model) (string, error) 
 		model.ID,
 		hash,
 		jwt.StandardClaims{
-			Issuer: "ppcbG",
+			Issuer: "auth",
 		},
 	}
 	tokenObj := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	token, err := tokenObj.SignedString([]byte(self.config.GetSharedSecret()))
+	token, err := tokenObj.SignedString([]byte(self.config.GetValueForKey(shared.SecretKey)))
 	if err != nil {
 		return "", err
 	}
@@ -161,6 +163,9 @@ func (self *DefaultUseCase)generateTokenFromModel(model *Model) (string, error) 
 }
 
 func NewDefaultUseCase(repository Repository, config shared.Config, deliverer shared.SMSDeliverer) *DefaultUseCase{
+	if config.GetValueForKey(shared.SecretKey) == ""{
+		panic("empty shared secret")
+	}
 	return &DefaultUseCase{repository:repository, config:config, deliverer:deliverer}
 }
 
