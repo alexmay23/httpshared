@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/alexmay23/httputils"
 	"strconv"
-	"bitbucket.org/alexmay_23/true_fund_server/shared"
 	"net/http"
 )
 
@@ -35,6 +34,18 @@ func (self ObjectLocation) MarshalJSON() ([]byte, error) {
 	})
 }
 
+func LongitudeValidators(key string) []httputils.Validator {
+	upper := 180.0
+	bottom := -180.0
+	return httputils.RequiredFloatValidators(key, httputils.FloatInRangeValidator(key, httputils.FloatRange{&upper, &bottom}))
+}
+
+func LatitudeValidators(key string) []httputils.Validator {
+	upper := 90.0
+	bottom := -90.0
+	return httputils.RequiredFloatValidators("latitude", httputils.FloatInRangeValidator("longitude", httputils.FloatRange{&upper, &bottom}))
+}
+
 
 func DistanceValidator() httputils.Validator {
 	bottom := 0
@@ -47,18 +58,18 @@ func DistanceValidator() httputils.Validator {
 func ParseGeoLocation(longitudeRaw string, latitudeRaw string)(float64, float64, error){
 	longitude, err := strconv.ParseFloat(longitudeRaw, 64)
 	if err != nil{
-		return 0, 0, shared.NewServerError(400, "longitude", "INVALID_FLOAT", "INVALID_FLOAT")
+		return 0, 0, NewServerError(400, "longitude", "INVALID_FLOAT", "INVALID_FLOAT")
 	}
 	latitude, err := strconv.ParseFloat(latitudeRaw, 64)
 	if err != nil{
-		return 0, 0, shared.NewServerError(400, "longitude", "INVALID_FLOAT", "INVALID_FLOAT")
+		return 0, 0, NewServerError(400, "longitude", "INVALID_FLOAT", "INVALID_FLOAT")
 	}
 
-	errs := httputils.ValidateValue(longitude, shared.LongitudeValidators("longitude"))
+	errs := httputils.ValidateValue(longitude, LongitudeValidators("longitude"))
 	if errs != nil{
 		return 0, 0, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 	}
-	errs = httputils.ValidateValue(latitude, shared.LongitudeValidators("latitude"))
+	errs = httputils.ValidateValue(latitude, LongitudeValidators("latitude"))
 	if errs != nil{
 		return 0, 0, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 	}
@@ -84,7 +95,7 @@ func LocationParametersFromRequest(req *http.Request, defaultMaxDistance int64)(
 
 		maxDistance, err = strconv.ParseInt(*maxDistanceRaw, 10, 64)
 		if err != nil{
-			return nil, shared.NewServerError(400, "max_distance", "INVALID_INT", "INVALID_INT")
+			return nil, NewServerError(400, "max_distance", "INVALID_INT", "INVALID_INT")
 		}
 
 		errs := httputils.ValidateValue(maxDistanceRaw, httputils.RequiredIntValidators("max_distance", DistanceValidator()))
@@ -97,7 +108,7 @@ func LocationParametersFromRequest(req *http.Request, defaultMaxDistance int64)(
 
 		minDistance, err = strconv.ParseInt(*minDistanceRaw, 10, 64)
 		if err != nil{
-			return nil, shared.NewServerError(400, "min_distance", "INVALID_FLOAT", "INVALID_FLOAT")
+			return nil, NewServerError(400, "min_distance", "INVALID_FLOAT", "INVALID_FLOAT")
 		}
 
 		errs := httputils.ValidateValue(maxDistanceRaw, httputils.RequiredIntValidators("min_distance", DistanceValidator()))
@@ -107,7 +118,7 @@ func LocationParametersFromRequest(req *http.Request, defaultMaxDistance int64)(
 	}
 
 	if minDistance > maxDistance{
-		return nil, shared.NewServerError(400, "min_distance", "Min distance more tham max", "MIN_MAX_ERROR")
+		return nil, NewServerError(400, "min_distance", "Min distance more tham max", "MIN_MAX_ERROR")
 	}
 
 	return &LocationParameters{Latitude:latitude, Longitude:longitude, MinDistance:minDistance, MaxDistance:maxDistance}, nil
