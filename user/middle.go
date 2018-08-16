@@ -13,16 +13,7 @@ import (
 func CreateUserMiddleware(useCase UseCase) shared.Middleware {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-			tokenStr := ""
-			if AuthHeader := req.Header.Get("Authorization"); AuthHeader != "" {
-				tokenStr = strings.Split(AuthHeader, " ")[1]
-			}
-			if tokenStr == "" {
-				token :=  httputils.GetValueFromURLInRequest(req, "token")
-				if token != nil {
-					tokenStr = *token
-				}
-			}
+			tokenStr := GetTokenFromRequest(req)
 			if tokenStr == "" {
 				httputils.HTTP401().Write(w)
 				return
@@ -35,6 +26,21 @@ func CreateUserMiddleware(useCase UseCase) shared.Middleware {
 			next.ServeHTTP(w, httputils.SetInContext(model, "CurrentUser", req))
 		})
 	}
+}
+
+
+func GetTokenFromRequest(req *http.Request)string{
+	tokenStr := ""
+	if AuthHeader := req.Header.Get("Authorization"); AuthHeader != "" {
+		tokenStr = strings.Split(AuthHeader, " ")[1]
+	}
+	if tokenStr == "" {
+		token :=  httputils.GetValueFromURLInRequest(req, "token")
+		if token != nil {
+			tokenStr = *token
+		}
+	}
+	return tokenStr
 }
 
 
