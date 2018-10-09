@@ -98,15 +98,22 @@ func (self *MongoRepository) CreateWithPhone(phone string, code int) *Model {
 
 func (self *MongoRepository)CreateWithFB(id string, name string, avatar string, phone *string)*Model{
 
-	m := MongoModel{FBId:id, Name:name, Avatar:avatar, Secret: httputils.RandStringBytes(8), ID:bson.NewObjectId()}
+	m := MongoModel{FBId:id, Name:name, Avatar:avatar, Secret: httputils.RandStringBytes(8)}
 	query := bson.M{"fb_id": id}
 	if phone != nil{
 		m.Phone = *phone;
 		query = bson.M{"$or":[]bson.M{query, {"phone": *phone}}}
 	}
-	_, err := self.collection.Upsert(query, &m)
+	var current MongoModel
+	err := self.collection.Find(query).One(&current)
+	if err == nil{
+		m.ID = current.ID
+	}else{
+		m.ID = bson.NewObjectId()
+	}
+	_, err = self.collection.Upsert(query, &m)
 	if err != nil {
-		return nil
+		panic(err)
 	}
 	v := &Model{m.ID.Hex(), m.Phone, m.Name, m.Avatar, m.FBId,0, m.Secret}
 	return v
