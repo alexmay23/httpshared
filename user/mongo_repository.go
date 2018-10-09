@@ -104,15 +104,10 @@ func (self *MongoRepository)CreateWithFB(id string, name string, avatar string, 
 		m.Phone = *phone;
 		query = bson.M{"$or":[]bson.M{query, {"phone": *phone}}}
 	}
-
-	v := self.oneBy(query)
-	if v != nil{
-		return v
-	}
 	_, err := self.collection.Upsert(query, &m)
 	if err != nil {
 		return nil
 	}
-	v = &Model{m.ID.Hex(), m.Phone, m.Name, m.Avatar, m.FBId,0, m.Secret}
+	v := &Model{m.ID.Hex(), m.Phone, m.Name, m.Avatar, m.FBId,0, m.Secret}
 	return v
 }

@@ -65,7 +65,7 @@ func (self *DefaultUseCase) SignWithFacebook(token string)(*AuthResponse, error)
 		return nil, HTTP400(err)
 	}
 	m := self.repository.CreateWithFB(fbResponse.ID, fbResponse.Name,
-		fmt.Sprintf("http://graph.facebook.com/%s/picture?type=square&width=200&height=200", fbResponse.ID), nil)
+		fmt.Sprintf("https://graph.facebook.com/%s/picture?type=square&width=200&height=200", fbResponse.ID), nil)
 	jsonWebToken, err := self.generateTokenFromModel(m)
 	if err != nil{
 		panic(err)
