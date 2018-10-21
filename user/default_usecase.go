@@ -3,6 +3,7 @@ package user
 import (
 	"github.com/dgrijalva/jwt-go"
 	"fmt"
+	"log"
 	"errors"
 	"math/rand"
 	"github.com/alexmay23/httputils"
@@ -99,10 +100,12 @@ func (self *DefaultUseCase)Update(model *Model, data map[string]interface{})*Mod
 }
 
 func (self *DefaultUseCase) GetValidModelFromToken(token string) (*Model) {
+	log.Printf("PASSED", token)
 	userData, err := self.getUserDataFromToken(token)
 	if err != nil {
 		return nil
 	}
+
 	model := self.repository.GetById(userData["user_id"].(string))
 	if model == nil {
 		return nil
@@ -114,6 +117,7 @@ func (self *DefaultUseCase) GetValidModelFromToken(token string) (*Model) {
 }
 
 func (self *DefaultUseCase) getUserDataFromToken(token string)(map[string]interface{}, error) {
+
 	tokenObj, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

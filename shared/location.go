@@ -3,6 +3,7 @@ package shared
 import (
 	"encoding/json"
 	"github.com/alexmay23/httputils"
+	"gopkg.in/mgo.v2/bson"
 	"strconv"
 	"net/http"
 )
@@ -18,6 +19,18 @@ type LocationParameters struct {
 func NewObjectLocation(latitude , longitude float64)*ObjectLocation{
 	return &ObjectLocation{"Point", []float64{longitude, latitude}}
 }
+
+func LocationParametersToMongoQuery(parameters *LocationParameters) bson.M {
+	if parameters == nil {
+		return nil
+	}
+	return bson.M{"$near": bson.M{
+		"$geometry":    bson.M{"type": "Point", "coordinates": []float64{parameters.Longitude, parameters.Latitude}},
+		"$maxDistance": parameters.MaxDistance,
+		"$minDistance": parameters.MinDistance,
+	},}
+}
+
 
 type ObjectLocation struct {
 	Type        string
@@ -66,11 +79,11 @@ func ParseGeoLocation(longitudeRaw string, latitudeRaw string)(float64, float64,
 	}
 
 	errs := httputils.ValidateValue(longitude, LongitudeValidators("longitude"))
-	if errs != nil{
+	if len(errs) > 0{
 		return 0, 0, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 	}
-	errs = httputils.ValidateValue(latitude, LongitudeValidators("latitude"))
-	if errs != nil{
+	errs = httputils.ValidateValue(latitude, LatitudeValidators("latitude"))
+	if len(errs) > 0{
 		return 0, 0, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 	}
 	return longitude, latitude, nil
