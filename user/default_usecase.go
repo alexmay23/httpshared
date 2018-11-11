@@ -40,16 +40,20 @@ func (self *DefaultUseCase) SendCode(phone string) {
 type FBResponse struct {
 	Name string `json:"name"`
 	ID   string `json:"id"`
+	Birthday string `json:"birthday"`
+	Email string `json:"email"`
+	Gender string `json:"gender"`
+	Avatar string `json:"avatar"`
 }
 
 func HTTP400(err error)httputils.ServerError{
 	return httputils.ServerError{400, httputils.Errors{[]httputils.Error{httputils.UndefinedKeyError("INVALID_REQUEST", err.Error())}}}
 }
 
-func (self *DefaultUseCase) SignWithFacebook(token string)(*AuthResponse, error) {
+func GetDataFromFacebook(token string,  fields string, photoDimension int)(*FBResponse, error){
 	ctx, _ := context.WithTimeout(context.Background(), 5 *time.Second)
 	url := fmt.Sprintf(
-	"https://graph.facebook.com/v3.0/me?fields=name&access_token=%s", token)
+		"https://graph.facebook.com/v3.0/me?fields=%s&access_token=%s",fields, token)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil{
 		return nil, HTTP400(err)
@@ -65,8 +69,16 @@ func (self *DefaultUseCase) SignWithFacebook(token string)(*AuthResponse, error)
 	if err != nil{
 		return nil, HTTP400(err)
 	}
-	m := self.repository.CreateWithFB(fbResponse.ID, fbResponse.Name,
-		fmt.Sprintf("https://graph.facebook.com/%s/picture?type=square&width=200&height=200", fbResponse.ID), nil)
+	fbResponse.Avatar = fmt.Sprintf("https://graph.facebook.com/%s/picture?type=square&width=%d&height=%d", fbResponse.ID, photoDimension, photoDimension)
+	return &fbResponse, nil
+}
+
+func (self *DefaultUseCase) SignWithFacebook(token string)(*AuthResponse, error) {
+	fbResponse, err := GetDataFromFacebook(token,"email", 200)
+	if err != nil{
+		return nil, err
+	}
+	m := self.repository.CreateWithFB(fbResponse.ID, fbResponse.Name, fbResponse.Avatar, nil)
 	jsonWebToken, err := self.generateTokenFromModel(m)
 	if err != nil{
 		panic(err)
