@@ -2,7 +2,7 @@ package user
 
 import (
 	"github.com/ti/mdb"
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 	"github.com/alexmay23/httputils"
 )
 

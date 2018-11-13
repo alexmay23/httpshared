@@ -1,7 +1,7 @@
 package shared
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"github.com/globalsign/mgo/bson"
 	"github.com/alexmay23/httputils"
 	"net/http"
 )

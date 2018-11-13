@@ -1,6 +1,6 @@
 package shared
 
-import "gopkg.in/mgo.v2/bson"
+import "github.com/globalsign/mgo/bson"
 
 func IsEqual(lhs *bson.ObjectId, rhs *bson.ObjectId) bool {
 	if lhs == rhs {
