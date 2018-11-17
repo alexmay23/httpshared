@@ -74,11 +74,11 @@ func GetDataFromFacebook(token string,  fields string, photoDimension int)(*FBRe
 }
 
 func (self *DefaultUseCase) SignWithFacebook(token string)(*AuthResponse, error) {
-	fbResponse, err := GetDataFromFacebook(token,"email", 200)
+	fbResponse, err := GetDataFromFacebook(token,"email,name,first_name", 200)
 	if err != nil{
 		return nil, err
 	}
-	m := self.repository.CreateWithFB(fbResponse.ID, fbResponse.Name, fbResponse.Avatar, nil)
+	m := self.repository.CreateWithFB(fbResponse.ID, fbResponse.Name, fbResponse.Avatar, fbResponse.Email, nil)
 	jsonWebToken, err := self.generateTokenFromModel(m)
 	if err != nil{
 		panic(err)

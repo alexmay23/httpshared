@@ -24,6 +24,7 @@ type MongoModel struct {
 	Avatar string
 	FBId   string        `bson:"fb_id"`
 	Name   string
+	Email  string
 	Code   int
 	Secret string
 }
@@ -79,7 +80,7 @@ func (self *MongoRepository) oneBy(query bson.M) *Model {
 }
 
 func (self *MongoRepository) Update(model *Model) {
-	m := MongoModel{bson.ObjectIdHex(model.ID), model.Phone, model.Avatar, model.FBId, model.Name,model.Code, model.Secret}
+	m := MongoModel{bson.ObjectIdHex(model.ID),  model.Phone, model.Avatar, model.FBId, model.Name,model.Email,model.Code, model.Secret}
 	err := self.collection.UpdateId(m.ID, m)
 	if err != nil {
 		panic(err)
@@ -92,13 +93,13 @@ func (self *MongoRepository) CreateWithPhone(phone string, code int) *Model {
 	if err != nil {
 		return nil
 	}
-	v := Model{info.UpsertedId.(bson.ObjectId).Hex(), m.Phone, "", "","",m.Code, m.Secret}
+	v := Model{info.UpsertedId.(bson.ObjectId).Hex(), m.Phone, "", "","",m.Email,m.Code, m.Secret}
 	return &v
 }
 
-func (self *MongoRepository)CreateWithFB(id string, name string, avatar string, phone *string)*Model{
+func (self *MongoRepository)CreateWithFB(id string, name string, avatar string, email string, phone *string)*Model{
 
-	m := MongoModel{FBId:id, Name:name, Avatar:avatar}
+	m := MongoModel{FBId:id, Name:name, Avatar:avatar, Email:email}
 	query := bson.M{"fb_id": id}
 	if phone != nil{
 		m.Phone = *phone;
@@ -117,6 +118,6 @@ func (self *MongoRepository)CreateWithFB(id string, name string, avatar string, 
 	if err != nil {
 		panic(err)
 	}
-	v := &Model{m.ID.Hex(), m.Phone, m.Name, m.Avatar, m.FBId,0, m.Secret}
+	v := &Model{m.ID.Hex(), m.Phone, m.Name, m.Avatar, m.FBId,m.Email,0, m.Secret}
 	return v
 }
