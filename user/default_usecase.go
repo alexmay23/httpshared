@@ -44,6 +44,7 @@ type FBResponse struct {
 	Email string `json:"email"`
 	Gender string `json:"gender"`
 	Avatar string `json:"avatar"`
+	TokenForBusiness string `json:"token_for_business"`
 }
 
 func HTTP400(err error)httputils.ServerError{
@@ -74,11 +75,11 @@ func GetDataFromFacebook(token string,  fields string, photoDimension int)(*FBRe
 }
 
 func (self *DefaultUseCase) SignWithFacebook(token string)(*AuthResponse, error) {
-	fbResponse, err := GetDataFromFacebook(token,"email,name,first_name", 200)
+	fbResponse, err := GetDataFromFacebook(token,"email,name,first_name,token_for_business", 200)
 	if err != nil{
 		return nil, err
 	}
-	m := self.repository.CreateWithFB(fbResponse.ID, fbResponse.Name, fbResponse.Avatar, fbResponse.Email, nil)
+	m := self.repository.CreateWithFB(fbResponse.ID, fbResponse.Name, fbResponse.Avatar, fbResponse.Email, fbResponse.TokenForBusiness, nil)
 	jsonWebToken, err := self.generateTokenFromModel(m)
 	if err != nil{
 		panic(err)

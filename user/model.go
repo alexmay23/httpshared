@@ -11,6 +11,7 @@ type Model struct {
 	Name 	 string  `json:"name"`
 	Avatar 	 string  `json:"avatar"`
 	FBId     string  `json:"-"`
+	FBBusinessToken string `json:"-"`
 	Email    string   `json:"-"`
 	Code     int    `json:"-"`
 	Secret string `json:"-"`
