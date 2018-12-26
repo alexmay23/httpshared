@@ -111,7 +111,7 @@ func LocationParametersFromRequest(req *http.Request, defaultMaxDistance int64)(
 			return nil, NewServerError(400, "max_distance", "INVALID_INT", "INVALID_INT")
 		}
 
-		errs := httputils.ValidateValue(maxDistanceRaw, httputils.RequiredIntValidators("max_distance", DistanceValidator()))
+		errs := httputils.ValidateValue(maxDistance, httputils.RequiredIntValidators("max_distance", DistanceValidator()))
 		if errs != nil{
 			return nil, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 		}
@@ -121,10 +121,10 @@ func LocationParametersFromRequest(req *http.Request, defaultMaxDistance int64)(
 
 		minDistance, err = strconv.ParseInt(*minDistanceRaw, 10, 64)
 		if err != nil{
-			return nil, NewServerError(400, "min_distance", "INVALID_FLOAT", "INVALID_FLOAT")
+			return nil, NewServerError(400, "min_distance", "INVALID_INT", "INVALID_INT")
 		}
 
-		errs := httputils.ValidateValue(maxDistanceRaw, httputils.RequiredIntValidators("min_distance", DistanceValidator()))
+		errs := httputils.ValidateValue(minDistance, httputils.RequiredIntValidators("min_distance", DistanceValidator()))
 		if errs != nil{
 			return nil, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 		}
