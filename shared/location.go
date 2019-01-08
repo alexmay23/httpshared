@@ -61,9 +61,9 @@ func LatitudeValidators(key string) []httputils.Validator {
 
 
 func DistanceValidator() httputils.Validator {
-	bottom := 0
-	upper := 32000000000
-	return httputils.IntInRangeValidator("max_distance", httputils.IntRange{Bottom: &bottom, Upper: &upper})
+	var bottom int64 = 0
+	var upper int64 = 32000000000
+	return httputils.Int64InRangeValidator("max_distance", httputils.Int64Range{Bottom: &bottom, Upper: &upper})
 }
 
 
