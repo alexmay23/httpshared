@@ -1,6 +1,10 @@
 package shared
 
-import "github.com/globalsign/mgo/bson"
+import (
+	"github.com/alexmay23/httputils"
+	"github.com/globalsign/mgo/bson"
+	"github.com/ti/mdb"
+)
 
 func IsEqual(lhs *bson.ObjectId, rhs *bson.ObjectId) bool {
 	if lhs == rhs {
@@ -13,6 +17,27 @@ func IsEqual(lhs *bson.ObjectId, rhs *bson.ObjectId) bool {
 		}
 	}
 }
+
+func FindMany(collection *mdb.Collection, parameters bson.M, skip, limit *int)(map[string]interface{}, error){
+	var values []bson.M
+	query := collection.Find(parameters)
+	count, err  := query.Count()
+	if err != nil{
+		return nil, err
+	}
+	query = httputils.ApplySkipLimit(query, skip, limit)
+	err = query.All(&values)
+	if err != nil{
+		return nil, err
+	}
+
+	result := map[string]interface{}{
+		"total": count,
+		"objects": values,
+	}
+	return result, nil
+}
+
 
 func IsEqualStrings(lhs *string, rhs *string) bool {
 	if lhs == rhs {

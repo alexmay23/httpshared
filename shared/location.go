@@ -112,7 +112,7 @@ func LocationParametersFromRequest(req *http.Request, defaultMaxDistance int64)(
 		}
 
 		errs := httputils.ValidateValue(maxDistance, httputils.RequiredIntValidators("max_distance", DistanceValidator()))
-		if errs != nil{
+		if len(errs) > 0{
 			return nil, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 		}
 	}
@@ -125,7 +125,7 @@ func LocationParametersFromRequest(req *http.Request, defaultMaxDistance int64)(
 		}
 
 		errs := httputils.ValidateValue(minDistance, httputils.RequiredIntValidators("min_distance", DistanceValidator()))
-		if errs != nil{
+		if len(errs) > 0{
 			return nil, httputils.ServerError{StatusCode: 400, Errors: httputils.Errors{Errors: errs}}
 		}
 	}
