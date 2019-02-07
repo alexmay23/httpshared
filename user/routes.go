@@ -7,9 +7,9 @@ import (
 
 func (self *Transport) RegisterInRouter(router *httputils.Router) {
 	middle := CreateUserMiddleware(self.useCase)
-	router.Post("/verify", httputils.DefaultMiddlewares(http.HandlerFunc(self.VerifyHandler)))
-	router.Post("/send", httputils.DefaultMiddlewares(http.HandlerFunc(self.SendHandler)))
-	router.Post("/sign", httputils.DefaultMiddlewares(http.HandlerFunc(self.SignSocialHandler)))
-	router.Put("/user", httputils.DefaultMiddlewares(middle(http.HandlerFunc(self.UpdateHandler))))
-	router.Get("/user", httputils.DefaultMiddlewares(middle(http.HandlerFunc(self.GetCurrentUserHandler))))
+	router.Post("/verify",  self.defaultMiddleWare(http.HandlerFunc(self.VerifyHandler)))
+	router.Post("/send", self.defaultMiddleWare(http.HandlerFunc(self.SendHandler)))
+	router.Post("/sign", self.defaultMiddleWare(http.HandlerFunc(self.SignSocialHandler)))
+	router.Put("/user", self.defaultMiddleWare(middle(http.HandlerFunc(self.UpdateHandler))))
+	router.Get("/user", self.defaultMiddleWare(middle(http.HandlerFunc(self.GetCurrentUserHandler))))
 }

@@ -9,12 +9,13 @@ import (
 
 type Transport struct {
 	useCase UseCase
+	defaultMiddleWare shared.Middleware
 }
 
 
 
-func NewTransport(useCase UseCase) *Transport{
-	return &Transport{useCase:useCase}
+func NewTransport(useCase UseCase, defaultMiddleWare shared.Middleware) *Transport{
+	return &Transport{useCase:useCase, defaultMiddleWare:defaultMiddleWare}
 }
 
 func SendCodeValidatorMap()httputils.VMap{
