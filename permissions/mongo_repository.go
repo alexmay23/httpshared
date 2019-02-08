@@ -14,18 +14,24 @@ func NewMongoRepository(database *mdb.Database) *MongoRepository {
 }
 
 
+type mongoObject struct {
+	UserId bson.ObjectId `bson:"user_id"`
+	Permissions []string `bson:"permissions"`
+	ID bson.ObjectId `bson:"_id"`
+}
+
+
 func (self *MongoRepository) GetPermissions(userId string) []string {
-	var result map[string]interface{}
+	var result mongoObject
 	query := bson.M{"user_id": bson.ObjectIdHex(userId)}
 	err := self.collection.Find(query).One(&result)
 	if err != nil{
-		_, err := self.collection.Upsert(query, bson.M{"_id": bson.NewObjectId(), "permissions": []string{},
-			"user_id": bson.ObjectIdHex(userId)})
+		_, err := self.collection.Upsert(query, mongoObject{UserId:bson.ObjectIdHex(userId), ID:bson.NewObjectId(), Permissions:[]string{}})
 		if err != nil{
 			panic(err)
 		}
 		return []string{}
 	}
-	return result["permissions"].([]string)
+	return result.Permissions
 }
 
