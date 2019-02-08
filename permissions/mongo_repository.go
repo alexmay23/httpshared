@@ -19,7 +19,8 @@ func (self *MongoRepository) GetPermissions(userId string) []string {
 	query := bson.M{"user_id": bson.ObjectIdHex(userId)}
 	err := self.collection.Find(query).One(&result)
 	if err != nil{
-		_, err := self.collection.Upsert(query, bson.M{"_id": bson.NewObjectId(), "permissions": []string{}})
+		_, err := self.collection.Upsert(query, bson.M{"_id": bson.NewObjectId(), "permissions": []string{},
+			"user_id": bson.ObjectIdHex(userId)})
 		if err != nil{
 			panic(err)
 		}
