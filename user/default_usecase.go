@@ -1,18 +1,17 @@
 package user
 
 import (
-	"github.com/dgrijalva/jwt-go"
-	"fmt"
-	"log"
-	"errors"
-	"math/rand"
-	"github.com/alexmay23/httputils"
 	"context"
-	"time"
-	"net/http"
 	"encoding/json"
-	"io/ioutil"
+	"errors"
+	"fmt"
 	"github.com/alexmay23/httpshared/shared"
+	"github.com/alexmay23/httputils"
+	"github.com/dgrijalva/jwt-go"
+	"io/ioutil"
+	"math/rand"
+	"net/http"
+	"time"
 )
 
 type DefaultUseCase struct {
@@ -113,7 +112,6 @@ func (self *DefaultUseCase)Update(model *Model, data map[string]interface{})*Mod
 }
 
 func (self *DefaultUseCase) GetValidModelFromToken(token string) (*Model) {
-	log.Printf("PASSED", token)
 	userData, err := self.getUserDataFromToken(token)
 	if err != nil {
 		return nil

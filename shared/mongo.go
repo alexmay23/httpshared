@@ -4,6 +4,7 @@ import (
 	"github.com/alexmay23/httputils"
 	"github.com/globalsign/mgo/bson"
 	"github.com/ti/mdb"
+	"net/http"
 )
 
 func IsEqual(lhs *bson.ObjectId, rhs *bson.ObjectId) bool {
@@ -16,6 +17,15 @@ func IsEqual(lhs *bson.ObjectId, rhs *bson.ObjectId) bool {
 			return lhs.Hex() == rhs.Hex()
 		}
 	}
+}
+
+
+func ObjectIdOrError(r *http.Request, key string)(string, error){
+	id := httputils.GetValueFromURLInRequest(r, key)
+	if id == nil || !bson.IsObjectIdHex(*id){
+		return "", httputils.HTTP400()
+	}
+	return *id, nil
 }
 
 func FindMany(collection *mdb.Collection, parameters bson.M, skip, limit *int)(map[string]interface{}, error){
